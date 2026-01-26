@@ -16,11 +16,11 @@ resource "kubernetes_manifest" "argocd_appset_platform" {
           "git" = {
             "files" = [
               {
-                "path" = "platform/clusters/non-prod/gcdc-auroramgmt-rancher/config.yaml"
+                "path" = var.github_path
               }
             ]
             "repoURL"  = var.github_url
-            "revision" = "feat/gcdc-auroramgmt-rancher"
+            "revision" = var.github_branch
           }
         }
       ]

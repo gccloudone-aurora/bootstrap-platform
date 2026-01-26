@@ -11,3 +11,11 @@ variable "github_username" {
 variable "github_url" {
   description = "The GitHub url for the project repository."
 }
+
+variable "github_branch" {
+  description = "The GitHub branch for the project repository."
+}
+
+variable "github_path" {
+  description = "The GitHub path for the config.yaml file in the project repository."
+}
