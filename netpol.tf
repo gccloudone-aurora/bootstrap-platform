@@ -51,13 +51,41 @@ resource "kubernetes_network_policy" "allow_all_outbound" {
 #
 # TODO: https://github.com/cilium/cilium/issues/20550#issuecomment-1840835096
 #
-resource "kubernetes_manifest" "cilium_network_policy" {
+resource "kubernetes_manifest" "allow_egress_apiserver_platform" {
   manifest = {
     "apiVersion" = "cilium.io/v2"
     "kind"       = "CiliumNetworkPolicy"
     "metadata" = {
       "name"      = "allow-egress-apiserver"
       "namespace" = kubernetes_namespace_v1.platform_management_system.metadata[0].name
+    }
+    "spec" = {
+      "egress" = [
+        {
+          "toEntities" = [
+            "kube-apiserver"
+          ]
+        }
+      ]
+      "endpointSelector" = {}
+    }
+  }
+}
+
+
+# Represents one Kubernetes resource by supplying a manifest attribute.
+#
+# https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest
+#
+# TODO: https://github.com/cilium/cilium/issues/20550#issuecomment-1840835096
+#
+resource "kubernetes_manifest" "allow_egress_apiserver_argo" {
+  manifest = {
+    "apiVersion" = "cilium.io/v2"
+    "kind"       = "CiliumNetworkPolicy"
+    "metadata" = {
+      "name"      = "allow-egress-apiserver"
+      "namespace" = kubernetes_namespace_v1.argo_operator_system.metadata[0].name
     }
     "spec" = {
       "egress" = [

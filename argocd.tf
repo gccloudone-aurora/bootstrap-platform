@@ -10,6 +10,7 @@ resource "helm_release" "argo_operator" {
   atomic          = true
   upgrade_install = true
   max_history     = 2
+  version         = "0.0.12"
 
   set = [
     {
@@ -36,7 +37,7 @@ resource "helm_release" "argocd_instance" {
   upgrade_install = true
   max_history     = 2
   force_update    = true
-  version         = "0.3.0"
+  version         = "0.15.0"
   set             = []
 
   depends_on = [helm_release.argo_operator]
