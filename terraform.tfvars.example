@@ -1,0 +1,5 @@
+github_token    = ""
+github_username = "aurora-svc"
+github_url      = "https://github.com/gccloudone-aurora/project-aurora-mgmt.git"
+github_branch   = "feat/gcdc-auroramgmt-rancher"
+github_path     = "platform/clusters/non-prod/gcdc-auroramgmt-rancher/config.yaml"
