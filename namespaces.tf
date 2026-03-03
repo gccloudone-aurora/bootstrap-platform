@@ -1,3 +1,7 @@
+# Multiple virtual clusters backed by the same physical cluster.
+#
+# https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace_v1
+#
 resource "kubernetes_namespace_v1" "argo_operator_system" {
   metadata {
     name = "argo-operator-system"
@@ -14,6 +18,10 @@ resource "kubernetes_namespace_v1" "argo_operator_system" {
   }
 }
 
+# Multiple virtual clusters backed by the same physical cluster.
+#
+# https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace_v1
+#
 resource "kubernetes_namespace_v1" "platform_system" {
   metadata {
     name = "platform-system"
@@ -30,6 +38,10 @@ resource "kubernetes_namespace_v1" "platform_system" {
   }
 }
 
+# Multiple virtual clusters backed by the same physical cluster.
+#
+# https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace_v1
+#
 resource "kubernetes_namespace_v1" "platform_management_system" {
   metadata {
     name = "platform-management-system"
