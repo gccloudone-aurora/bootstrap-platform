@@ -1,3 +1,11 @@
+variable "client_id" {
+  description = "The Workload Identity Client ID"
+}
+
+variable "config_context" {
+  description = "The Kubernetes config context"
+}
+
 variable "github_token" {
   description = "The GitHub token for the project repository."
 

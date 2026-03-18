@@ -39,6 +39,7 @@ resource "kubernetes_network_policy" "allow_all_outbound" {
         ip_block {
           cidr = "0.0.0.0/0"
         }
+        namespace_selector {}
       }
     }
     policy_types = ["Egress"]
@@ -71,7 +72,6 @@ resource "kubernetes_manifest" "allow_egress_apiserver_platform" {
     }
   }
 }
-
 
 # Represents one Kubernetes resource by supplying a manifest attribute.
 #

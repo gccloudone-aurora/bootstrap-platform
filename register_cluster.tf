@@ -18,9 +18,9 @@ module "argocd_cluster_sp" {
 #
 # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret
 #
-resource "kubernetes_secret" "cluster_gdpc_auroramgmt_rancher" {
+resource "kubernetes_secret" "cluster_bootstrap" {
   metadata {
-    name      = "gcdc-auroramgmt-rancher"
+    name      = "cluster-bootstrap"
     namespace = kubernetes_namespace_v1.platform_management_system.metadata[0].name
     labels = {
       "argocd.argoproj.io/secret-type" = "cluster"
@@ -30,7 +30,7 @@ resource "kubernetes_secret" "cluster_gdpc_auroramgmt_rancher" {
   type = "Opaque"
 
   data = {
-    "name"   = "gcdc-auroramgmt-rancher"
+    "name"   = "cluster-bootstrap"
     "server" = "https://kubernetes.default.svc.cluster.local"
     "config" = jsonencode({
       "bearerToken" = module.argocd_cluster_sp.service_account_token_secret.data.token

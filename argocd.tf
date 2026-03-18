@@ -38,7 +38,27 @@ resource "helm_release" "argocd_instance" {
   max_history     = 2
   force_update    = true
   version         = "0.15.0"
-  set             = []
+
+  values = [
+    yamlencode({
+      argocdInstance = {
+        repo = {
+          labels = {
+            "azure.workload.identity/use" = "true"
+          },
+          serviceAccountAnnotations = {
+            "azure.workload.identity/client-id" = var.client_id
+          }
+        }
+        argocdVaultPlugin = {
+          env = {
+            ARGOCD_ENV_AVP_TYPE       = "azurekeyvault"
+            ARGOCD_ENV_AZURE_CLIENT_ID = var.client_id
+          }
+        }
+      }
+    })
+  ]
 
   depends_on = [helm_release.argo_operator]
 }

@@ -6,7 +6,7 @@ resource "kubernetes_namespace_v1" "argo_operator_system" {
   metadata {
     name = "argo-operator-system"
     labels = {
-      "namespace.ssc-spc.gc.ca/purpose" = "platform"
+      "namespace.ssc-spc.gc.ca/purpose" = "system"
     }
   }
 
@@ -26,7 +26,7 @@ resource "kubernetes_namespace_v1" "platform_system" {
   metadata {
     name = "platform-system"
     labels = {
-      "namespace.ssc-spc.gc.ca/purpose" = "platform"
+      "namespace.ssc-spc.gc.ca/purpose" = "system"
     }
   }
 
@@ -46,7 +46,7 @@ resource "kubernetes_namespace_v1" "platform_management_system" {
   metadata {
     name = "platform-management-system"
     labels = {
-      "namespace.ssc-spc.gc.ca/purpose" = "platform"
+      "namespace.ssc-spc.gc.ca/purpose" = "system"
     }
   }
 
