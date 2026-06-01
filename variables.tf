@@ -1,5 +1,11 @@
 variable "client_id" {
-  description = "The Workload Identity Client ID"
+  description = "The Workload Identity Client ID. Set if bootstrapping for Azure."
+  default = ""
+}
+
+variable "gcp_project_id" {
+  description = "The GCP project ID where the management cluster is deployed."
+  default = ""
 }
 
 variable "config_context" {

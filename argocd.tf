@@ -42,18 +42,30 @@ resource "helm_release" "argocd_instance" {
   values = [
     yamlencode({
       argocdInstance = {
+        # repo = {
+        #   labels = {
+        #     "azure.workload.identity/use" = "true"
+        #   },
+        #   serviceAccountAnnotations = {
+        #     "azure.workload.identity/client-id" = var.client_id
+        #   }
+        # }
+        # argocdVaultPlugin = {
+        #   env = {
+        #     ARGOCD_ENV_AVP_TYPE       = "azurekeyvault"
+        #     ARGOCD_ENV_AZURE_CLIENT_ID = var.client_id
+        #   }
+        # }
+
+        ### GCP
         repo = {
-          labels = {
-            "azure.workload.identity/use" = "true"
-          },
           serviceAccountAnnotations = {
-            "azure.workload.identity/client-id" = var.client_id
+            "iam.gke.io/gcp-service-account" = "argocd-repo-server@${var.gcp_project_id}.iam.gserviceaccount.com"     # If using GSA to KSA binding
           }
         }
         argocdVaultPlugin = {
           env = {
-            ARGOCD_ENV_AVP_TYPE       = "azurekeyvault"
-            ARGOCD_ENV_AZURE_CLIENT_ID = var.client_id
+            ARGOCD_ENV_AVP_TYPE       = "gcpsecretmanager"
           }
         }
       }
