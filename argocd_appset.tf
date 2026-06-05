@@ -3,6 +3,7 @@
 # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest
 #
 resource "kubernetes_manifest" "argocd_appset_platform" {
+  depends_on = [ helm_release.argocd_instance ]
   manifest = {
     "apiVersion" = "argoproj.io/v1alpha1"
     "kind"       = "ApplicationSet"
@@ -38,14 +39,17 @@ resource "kubernetes_manifest" "argocd_appset_platform" {
           }
           "project" = "aurora"
           "source" = {
-            "chart" = "aurora-platform"
+            # "chart" = "aurora-platform"
+            ### Temporary while testing
+            "path" = "stable/aurora-platform"
             "helm" = {
               "releaseName" = "{{ path.basename }}"
               "values"      = <<EOT
 {{ settings }}
 EOT
             }
-            "repoURL"        = "https://gccloudone-aurora.github.io/aurora-platform-charts"
+            # "repoURL"        = "https://gccloudone-aurora.github.io/aurora-platform-charts"
+            "repoURL" = "https://github.com/gccloudone-aurora/aurora-platform-charts.git"
             "targetRevision" = "{{ version }}"
           }
           "syncPolicy" = {

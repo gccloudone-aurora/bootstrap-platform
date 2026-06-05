@@ -3,6 +3,15 @@
 This Terraform module should be treated as a root module. Run it once to stand
 up your infrastructure, then delete the statefile.
 
+## Running Bootstrap
+Need specific order of operations to allow CRDs to exist.
+
+```
+terraform apply -target=helm_release.argo_operator
+terraform apply -target=helm_release.argocd_instance
+terraform apply
+```
+
 ## Configuring AVP for specific platforms
 
 ### Azure

@@ -8,6 +8,11 @@ variable "gcp_project_id" {
   default = ""
 }
 
+variable "cluster_name" {
+  
+}
+variable "gke_control_plane_ip" {}
+
 variable "config_context" {
   description = "The Kubernetes config context"
 }

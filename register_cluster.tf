@@ -18,9 +18,9 @@ module "argocd_cluster_sp" {
 #
 # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret
 #
-resource "kubernetes_secret" "cluster_bootstrap" {
+resource "kubernetes_secret_v1" "cluster_bootstrap" {
   metadata {
-    name      = "cluster-bootstrap"
+    name      = var.cluster_name
     namespace = kubernetes_namespace_v1.platform_management_system.metadata[0].name
     labels = {
       "argocd.argoproj.io/secret-type" = "cluster"
@@ -30,7 +30,8 @@ resource "kubernetes_secret" "cluster_bootstrap" {
   type = "Opaque"
 
   data = {
-    "name"   = "cluster-bootstrap"
+    # "name"   = "cluster-bootstrap"
+    "name" = var.cluster_name
     "server" = "https://kubernetes.default.svc.cluster.local"
     "config" = jsonencode({
       "bearerToken" = module.argocd_cluster_sp.service_account_token_secret.data.token

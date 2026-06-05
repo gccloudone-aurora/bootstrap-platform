@@ -3,6 +3,7 @@
 # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest
 #
 resource "kubernetes_manifest" "argocd_appproject_aurora" {
+  depends_on = [ helm_release.argocd_instance ]
   manifest = {
     "apiVersion" = "argoproj.io/v1alpha1"
     "kind"       = "AppProject"
@@ -47,6 +48,7 @@ resource "kubernetes_manifest" "argocd_appproject_aurora" {
 # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest
 #
 resource "kubernetes_manifest" "argocd_appproject_aurora_core" {
+  depends_on = [ helm_release.argocd_instance ]
   manifest = {
     "apiVersion" = "argoproj.io/v1alpha1"
     "kind"       = "AppProject"
@@ -91,6 +93,7 @@ resource "kubernetes_manifest" "argocd_appproject_aurora_core" {
 # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest
 #
 resource "kubernetes_manifest" "argocd_appproject_aurora_app" {
+  depends_on = [ helm_release.argocd_instance ]
   manifest = {
     "apiVersion" = "argoproj.io/v1alpha1"
     "kind"       = "AppProject"
