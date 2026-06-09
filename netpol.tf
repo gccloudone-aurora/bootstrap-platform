@@ -45,72 +45,23 @@ resource "kubernetes_network_policy_v1" "allow_all_outbound" {
   }
 }
 
-# Represents one Kubernetes resource by supplying a manifest attribute.
-#
-# https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest
-#
-# TODO: https://github.com/cilium/cilium/issues/20550#issuecomment-1840835096
-#
-# resource "kubernetes_manifest" "allow_egress_apiserver_platform" {
-#   manifest = {
-#     "apiVersion" = "cilium.io/v2"
-#     "kind"       = "CiliumNetworkPolicy"
-#     "metadata" = {
-#       "name"      = "allow-egress-apiserver"
-#       "namespace" = kubernetes_namespace_v1.platform_management_system.metadata[0].name
-#     }
-#     "spec" = {
-#       "egress" = [
-#         {
-#           "toEntities" = [
-#             "kube-apiserver"
-#           ]
-#         }
-#       ]
-#       "endpointSelector" = {}
-#     }
-#   }
-# }
-
-# Represents one Kubernetes resource by supplying a manifest attribute.
-#
-# https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest
-#
-# TODO: https://github.com/cilium/cilium/issues/20550#issuecomment-1840835096
-#
-# resource "kubernetes_manifest" "allow_egress_apiserver_argo" {
-#   manifest = {
-#     "apiVersion" = "cilium.io/v2"
-#     "kind"       = "CiliumNetworkPolicy"
-#     "metadata" = {
-#       "name"      = "allow-egress-apiserver"
-#       "namespace" = kubernetes_namespace_v1.argo_operator_system.metadata[0].name
-#     }
-#     "spec" = {
-#       "egress" = [
-#         {
-#           "toEntities" = [
-#             "kube-apiserver"
-#           ]
-#         }
-#       ]
-#       "endpointSelector" = {}
-#     }
-#   }
-# }
-
 ### CCNP ###
 
+# Policy to allow cluster-wide egress to kube-apiserver
 resource "kubernetes_manifest" "allow_egress_to_apiserver_from_platform" {
   manifest = yamldecode(file("${path.module}/manifests/allow-egress-to-apiserver-from-platform.yaml"))
 }
 
 ### GKE Specific ###
 
+# Policy to allow egress to coredns and local dns cache in GKE
 resource "kubernetes_manifest" "gcp_egress_to_coredns" {
+  count = var.k8s_provider == "gcp" ? 1 : 0
   manifest = yamldecode(file("${path.module}/manifests/gcp-allow-egress-to-coredns.yaml"))
 }
 
+# Policy to allow egress to gke metadata and workload identity
 resource "kubernetes_manifest" "gcp_egress_to_metadata" {
+  count = var.k8s_provider == "gcp" ? 1 : 0
   manifest = yamldecode(file("${path.module}/manifests/gcp-allow-egress-to-metadata.yaml"))
 }
