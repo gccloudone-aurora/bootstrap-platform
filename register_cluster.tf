@@ -30,7 +30,6 @@ resource "kubernetes_secret_v1" "cluster_bootstrap" {
   type = "Opaque"
 
   data = {
-    # "name"   = "cluster-bootstrap"
     "name" = var.cluster_name
     "server" = "https://kubernetes.default.svc.cluster.local"
     "config" = jsonencode({

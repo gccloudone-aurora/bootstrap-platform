@@ -2,48 +2,48 @@
 #
 # https://registry.terraform.io/providers/hashicorp/kubernetes/1.13.3/docs/resources/network_policy
 #
-# resource "kubernetes_network_policy_v1" "allow_same_namespace" {
-#   metadata {
-#     name      = "allow-same-namespace"
-#     namespace = kubernetes_namespace_v1.platform_management_system.metadata[0].name
-#   }
-#   spec {
-#     pod_selector {}
-#     ingress {
-#       from {
-#         pod_selector {}
-#       }
-#     }
-#     egress {
-#       to {
-#         pod_selector {}
-#       }
-#     }
-#     policy_types = ["Ingress", "Egress"]
-#   }
-# }
+resource "kubernetes_network_policy_v1" "allow_same_namespace" {
+  metadata {
+    name      = "allow-same-namespace"
+    namespace = kubernetes_namespace_v1.platform_management_system.metadata[0].name
+  }
+  spec {
+    pod_selector {}
+    ingress {
+      from {
+        pod_selector {}
+      }
+    }
+    egress {
+      to {
+        pod_selector {}
+      }
+    }
+    policy_types = ["Ingress", "Egress"]
+  }
+}
 
 # Specify how groups of pods are allowed to communicate.
 #
 # https://registry.terraform.io/providers/hashicorp/kubernetes/1.13.3/docs/resources/network_policy
 #
-# resource "kubernetes_network_policy_v1" "allow_all_outbound" {
-#   metadata {
-#     name      = "allow-all-outbound"
-#     namespace = kubernetes_namespace_v1.platform_management_system.metadata[0].name
-#   }
-#   spec {
-#     pod_selector {}
-#     egress {
-#       to {
-#         ip_block {
-#           cidr = "0.0.0.0/0"
-#         }
-#       }
-#     }
-#     policy_types = ["Egress"]
-#   }
-# }
+resource "kubernetes_network_policy_v1" "allow_all_outbound" {
+  metadata {
+    name      = "allow-egress-to-internet-from-argo"
+    namespace = kubernetes_namespace_v1.platform_management_system.metadata[0].name
+  }
+  spec {
+    pod_selector {}
+    egress {
+      to {
+        ip_block {
+          cidr = "0.0.0.0/0"
+        }
+      }
+    }
+    policy_types = ["Egress"]
+  }
+}
 
 # Represents one Kubernetes resource by supplying a manifest attribute.
 #
@@ -99,188 +99,18 @@
 #   }
 # }
 
-### GKE Specific
+### CCNP ###
 
-# resource "kubernetes_network_policy_v1" "allow_egress_apiserver_platform" {
-#   metadata {
-#     name      = "allow-egress-apiserver"
-#     namespace = kubernetes_namespace_v1.platform_management_system.metadata[0].name
-#   }
-#   spec {
-#     pod_selector {}
-#     egress {
-#       ports {
-#         port = "443"
-#         protocol = "TCP"
-#       }
-#       to {
-#         ip_block {
-#           cidr = var.gke_control_plane_ip
-#         }
-#       }
-#     }
-#     policy_types = ["Egress"]
-#   }
-# }
+resource "kubernetes_manifest" "allow_egress_to_apiserver_from_platform" {
+  manifest = yamldecode(file("${path.module}/manifests/allow-egress-to-apiserver-from-platform.yaml"))
+}
 
-# resource "kubernetes_network_policy_v1" "allow_egress_apiserver_argo" {
-#   metadata {
-#     name      = "allow-egress-apiserver"
-#     namespace = kubernetes_namespace_v1.argo_operator_system.metadata[0].name
-#   }
-#   spec {
-#     pod_selector {}
-#     egress {
-#       ports {
-#         port = "443"
-#         protocol = "TCP"
-#       }
-#       to {
-#         ip_block {
-#           cidr = var.gke_control_plane_ip
-#         }
-#       }
-#     }
-#     policy_types = ["Egress"]
-#   }
-# }
+### GKE Specific ###
 
-# resource "kubernetes_network_policy_v1" "allow_dns_egress_argo" {
-#   metadata {
-#     name = "allow-dns-egress"
-#     namespace = kubernetes_namespace_v1.argo_operator_system.metadata[0].name
-#   }
+resource "kubernetes_manifest" "gcp_egress_to_coredns" {
+  manifest = yamldecode(file("${path.module}/manifests/gcp-allow-egress-to-coredns.yaml"))
+}
 
-#   spec {
-#     pod_selector {}
-#     policy_types = ["Egress"]
-
-#     egress {
-#       to {
-#         namespace_selector {
-#           match_labels = {
-#             "kubernetes.io/metadata.name" = "kube-system"
-#           }
-#         }
-#         pod_selector {
-#           match_labels = {
-#             "k8s-app" = "kube-dns"
-#           }
-#         }
-#       }
-#       ports {
-#         port = "53"
-#         protocol = "UDP"
-#       }
-#       ports {
-#         port = "53"
-#         protocol = "TCP"
-#       }
-#     }
-#   }
-# }
-
-# resource "kubernetes_network_policy_v1" "allow_dns_egress_platform" {
-#   metadata {
-#     name = "allow-dns-egress"
-#     namespace = kubernetes_namespace_v1.platform_management_system.metadata[0].name
-#   }
-
-#   spec {
-#     pod_selector {}
-#     policy_types = ["Egress"]
-
-#     egress {
-#       to {
-#         namespace_selector {
-#           match_labels = {
-#             "kubernetes.io/metadata.name" = "kube-system"
-#           }
-#         }
-#         pod_selector {
-#           match_labels = {
-#             "k8s-app" = "kube-dns"
-#           }
-#         }
-#       }
-#       ports {
-#         port = "53"
-#         protocol = "UDP"
-#       }
-#       ports {
-#         port = "53"
-#         protocol = "TCP"
-#       }
-#     }
-#   }
-# }
-
-# resource "kubernetes_manifest" "cluster_wide_dns_egress" {
-#   manifest = {
-#     "apiVersion" = "cilium.io/v2"
-#     "kind"       = "CiliumClusterwideNetworkPolicy"
-#     "metadata" = {
-#       "name"      = "global-allow-dns-egress"
-#     }
-#     "spec" = {
-#       "description" = "Globally allow DNS egress to kube-system/kube-dns"
-#       "egress" = [
-#         {
-#           "toEndpoints" = [
-#             {
-#               matchLabels = {
-#                 "k8s:io.kubernetes.pod.namespace" = "kube-system"
-#                 "k8s-app" = "kube-dns"
-#               }
-#             }
-#           ]
-#           "toPorts" = [
-#             {
-#               ports = [
-#                 {
-#                   port = "53"
-#                   protocol = "UDP"
-#                 },
-#                 {
-#                   port = "53"
-#                   protocol = "TCP"
-#                 }
-#               ]
-#             }
-#           ]
-#         }
-#       ]
-#       "endpointSelector" = {}
-#     }
-#   }
-# }
-
-# resource "kubernetes_manifest" "ccnp_allow_gke_metadata" {
-#   manifest = {
-#     "apiVersion" = "cilium.io/v2"
-#     "kind"       = "CiliumClusterwideNetworkPolicy"
-#     "metadata" = {
-#       "name"      = "global-allow-metadata-egress"
-#     }
-#     "spec" = {
-#       "egress" = [
-#         {
-#           "toCidr" = [
-#             "169.254.169.254/32" # GKE Metadata Server
-#           ]
-#           "toPorts" = [
-#             {
-#               port = "80"
-#               protocol = "TCP"
-#             },
-#             {
-#               port = "8080"
-#               protocol = "TCP"
-#             }
-#           ]
-#         }
-#       ]
-#       "endpointSelector" = {}
-#     }
-#   }
-# }
+resource "kubernetes_manifest" "gcp_egress_to_metadata" {
+  manifest = yamldecode(file("${path.module}/manifests/gcp-allow-egress-to-metadata.yaml"))
+}
