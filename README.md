@@ -7,12 +7,17 @@ up your infrastructure, then delete the statefile.
 Need specific order of operations to allow CRDs to exist.
 
 ```
+# Apply the operator helm chart
 terraform apply -target=helm_release.argo_operator
+# Apply the argocd helm chart
 terraform apply -target=helm_release.argocd_instance
+# Apply everything else required.
 terraform apply
 ```
 
 ## Configuring AVP for specific platforms
+
+Use the terraform variable `k8s_provider` and set it to the appropriate platform where Kubernetes is deployed. If adding new platforms update the variable validation accordingly and add the configuration to `local.argocd_values`.
 
 ### Azure
 
