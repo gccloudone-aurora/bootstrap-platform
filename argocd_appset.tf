@@ -3,7 +3,6 @@
 # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest
 #
 resource "kubernetes_manifest" "argocd_appset_platform" {
-  depends_on = [ helm_release.argocd_instance ]
   manifest = {
     "apiVersion" = "argoproj.io/v1alpha1"
     "kind"       = "ApplicationSet"
