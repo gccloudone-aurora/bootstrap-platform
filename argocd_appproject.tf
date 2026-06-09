@@ -17,7 +17,7 @@ resource "kubernetes_manifest" "argocd_appproject_aurora" {
           "kind"  = "*"
         }
       ]
-      "description" = "App Project for Aurora"
+      "description" = "App Project for Aurora Platform"
       "destinations" = [
         {
           "namespace" = "*"
@@ -61,7 +61,7 @@ resource "kubernetes_manifest" "argocd_appproject_aurora_core" {
           "kind"  = "*"
         }
       ]
-      "description" = "App Project for Aurora Platform"
+      "description" = "App Project for Aurora Core"
       "destinations" = [
         {
           "namespace" = "*"
