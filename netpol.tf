@@ -61,7 +61,8 @@ resource "kubernetes_manifest" "gcp_egress_to_coredns" {
 }
 
 # Policy to allow egress to gke metadata and workload identity
-resource "kubernetes_manifest" "gcp_egress_to_metadata" {
-  count = var.k8s_provider == "gcp" ? 1 : 0
-  manifest = yamldecode(file("${path.module}/manifests/gcp-allow-egress-to-metadata.yaml"))
+# Layer 7 (dns-based filtering) network policies do not work in GCP
+# https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-cilium-network-policy
+resource "kubernetes_manifest" "csp_egress_to_metadata" {
+  manifest = yamldecode(file("${path.module}/manifests/allow-egress-to-metadata.yaml"))
 }
