@@ -15,6 +15,18 @@ terraform apply -target=helm_release.argocd_instance
 terraform apply
 ```
 
+## Temporary Access for ArgoCD
+If argocd access is required and no ingress has been setup yet, you can port-forward the argocd service and access the UI locally.
+
+```
+# Port-Forward ArgoCD Service
+kubectl port-forward svc/argocd-server -n platform-management-system 8080:80
+# Get Temporay Admin Secret
+kubectl get secret argocd-cluster -n platform-management-system -o go-template='{{index .data "admin.password" | base64decode}}'; echo
+# Access ArgoCD locally in browser and login with username: admin password: [argocd admin secret]
+https://localhost:8080
+```
+
 ## Configuring AVP for specific platforms
 
 Use the terraform variable `k8s_provider` and set it to the appropriate platform where Kubernetes is deployed. If adding new platforms update the variable validation accordingly and add the configuration to `local.argocd_values`.
