@@ -2,7 +2,7 @@
 #
 # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret
 #
-resource "kubernetes_secret" "project_aurora_mgmt" {
+resource "kubernetes_secret_v1" "project_aurora_mgmt" {
   metadata {
     name      = "project-aurora-mgmt"
     namespace = kubernetes_namespace_v1.platform_management_system.metadata[0].name
@@ -23,7 +23,7 @@ resource "kubernetes_secret" "project_aurora_mgmt" {
 #
 # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret
 #
-resource "kubernetes_secret" "project_aurora_mgmt_repo_creds" {
+resource "kubernetes_secret_v1" "project_aurora_mgmt_repo_creds" {
   metadata {
     name      = "project-aurora-mgmt-repo-creds"
     namespace = kubernetes_namespace_v1.platform_management_system.metadata[0].name

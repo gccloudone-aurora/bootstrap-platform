@@ -1,5 +1,26 @@
+variable "k8s_provider" {
+  description = "The platform upon which Kubernetes is deployed. Currently can be 'azure' or 'gcp'"
+  validation {
+    condition = contains(["azure", "gcp"], var.k8s_provider)
+    error_message = "The k8s provider must be one of 'azure' or 'gcp'"
+  }
+}
+
+### AZURE ###
+
 variable "client_id" {
-  description = "The Workload Identity Client ID"
+  description = "The Workload Identity Client ID. Set if bootstrapping for Azure."
+  default = ""
+}
+
+### GCP ###
+variable "gcp_project_id" {
+  description = "The GCP project ID where the management cluster is deployed."
+  default = ""
+}
+
+variable "cluster_name" {
+  description = "The name of the kubernetes cluster. Used for setting up the initial cluster secret for ArgoCD registration."
 }
 
 variable "config_context" {

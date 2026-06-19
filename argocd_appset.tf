@@ -38,14 +38,22 @@ resource "kubernetes_manifest" "argocd_appset_platform" {
           }
           "project" = "aurora"
           "source" = {
-            "chart" = "aurora-platform"
+            ### Choose either remote helm repo or git based helm chart
+            ### If using remote helm repo
+            "chart"         = "aurora-platform"
+            "repoURL"       = "https://gccloudone-aurora.github.io/aurora-platform-charts"
+            ### End remote helm repo ###
+            ### If using git based helm chart
+            # "path"          = "stable/aurora-platform"
+            # "repoURL"       = "https://github.com/gccloudone-aurora/aurora-platform-charts.git"
+            ### End git based helm chart ###
             "helm" = {
               "releaseName" = "{{ path.basename }}"
               "values"      = <<EOT
 {{ settings }}
 EOT
             }
-            "repoURL"        = "https://gccloudone-aurora.github.io/aurora-platform-charts"
+            
             "targetRevision" = "{{ version }}"
           }
           "syncPolicy" = {
