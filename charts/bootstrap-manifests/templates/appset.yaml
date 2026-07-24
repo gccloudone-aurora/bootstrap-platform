@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: aurora-platform
+  namespace: {{ .Values.namespace }}
+spec:
+  generators:
+    - git:
+        files:
+          - path: {{ .Values.appSet.githubPath | quote }}
+        repoURL: {{ .Values.appSet.githubUrl | quote }}
+        revision: {{ .Values.appSet.githubBranch | quote }}
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      name: {{ printf "platform-%s" (print "{{ path.basename }}") | quote }}
+    spec:
+      destination:
+        name: in-cluster
+        namespace: {{ .Values.namespace }}
+      project: aurora
+      source:
+        chart: aurora-platform
+        repoURL: {{ .Values.appSet.helmRegistry | quote }}
+        helm:
+          releaseName: {{ print "{{ path.basename }}" | quote }}
+          values: |
+            {{ print "{{ settings }}" }}
+        targetRevision: {{ print "{{ version }}" | quote }}
+{{- if .Values.enableAutoSync }}
+      syncPolicy:
+        automated:
+          prune: false
+          selfHeal: true
+{{- end }}

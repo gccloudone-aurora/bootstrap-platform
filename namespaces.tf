@@ -22,7 +22,11 @@ resource "kubernetes_namespace_v1" "argo_operator_system" {
 #
 # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace_v1
 #
+# Only created when bootstrap manages argocd-mgmt itself. On AWS, the environment
+# kubernetes-bootstrap module already owns platform-system.
 resource "kubernetes_namespace_v1" "platform_system" {
+  count = var.cluster_registration == null ? 1 : 0
+
   metadata {
     name = "platform-system"
     labels = {

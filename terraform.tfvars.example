@@ -1,7 +1,24 @@
-client_id       = ""
-config_context  = ""
-github_token    = ""
-github_username = "aurora-svc"
-github_url      = "https://github.com/gccloudone-aurora/project-aurora-mgmt.git"
-github_branch   = "feat/gcdc-auroramgmt-rancher"
-github_path     = "platform/clusters/non-prod/gcdc-auroramgmt-rancher/config.yaml"
+# See terraform-aurora-aws-environment/examples/comprehensive/bootstrap for the
+# AWS remote-state root that calls this module.
+#
+# When calling this module directly, supply:
+k8s_provider = "aws"
+cluster_name = "mgmt-dev-cc-00"
+
+platform_git_repository = {
+  url    = "https://github.com/gccloudone-aurora/project-aurora-mgmt.git"
+  branch = "main"
+  path   = "clusters/non-prod/**/config.yaml"
+}
+
+github_auth = {
+  pat = {
+    username = "aurora-svc"
+    token    = ""
+  }
+}
+
+# cluster_registration = {
+#   token   = "..."
+#   ca_cert = "..."
+# }

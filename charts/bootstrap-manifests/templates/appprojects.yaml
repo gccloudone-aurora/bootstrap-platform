@@ -1,0 +1,32 @@
+{{- range .Values.appProjects }}
+{{- $autoSync := dig "autoSync" $.Values.enableAutoSync . }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  description: {{ .description | quote }}
+  destinations:
+    - namespace: "*"
+      server: "*"
+  orphanedResources:
+    warn: true
+  sourceRepos:
+    - "*"
+{{- if not $autoSync }}
+  # Deny all automated syncs; manualSync still allowed.
+  syncWindows:
+    - clusters:
+        - "*"
+      duration: 24h
+      kind: deny
+      manualSync: true
+      schedule: "* * * * *"
+      timeZone: America/Toronto
+{{- end }}
+{{- end }}
