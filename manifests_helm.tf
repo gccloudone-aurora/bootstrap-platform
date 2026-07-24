@@ -13,7 +13,7 @@ resource "helm_release" "bootstrap_manifests" {
 
   values = [
     yamlencode({
-      namespace       = kubernetes_namespace_v1.platform_management_system.metadata[0].name
+      namespace      = kubernetes_namespace_v1.platform_management_system.metadata[0].name
       enableAutoSync = var.enable_auto_sync
       appProjects = [
         {

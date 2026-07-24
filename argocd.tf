@@ -64,6 +64,36 @@ locals {
       }
     }
   }
+
+  github_app = try(var.github_auth.github_app, null)
+  github_pat = try(var.github_auth.pat, null)
+
+  repo_creds_url = local.github_app != null ? coalesce(local.github_app.creds_url, var.platform_git_repository.url) : var.platform_git_repository.url
+
+  # argocd-instance chart register.repositoryCreds (GitHub App requires chart >= 0.18.0)
+  repository_creds = local.github_app != null ? {
+    "project-aurora-mgmt-repo-creds" = {
+      type = "git"
+      url  = local.repo_creds_url
+      githubApp = merge(
+        {
+          id             = local.github_app.id
+          installationID = local.github_app.installation_id
+          privateKey     = local.github_app.private_key
+        },
+        local.github_app.enterprise_base_url != null ? {
+          enterpriseBaseUrl = local.github_app.enterprise_base_url
+        } : {}
+      )
+    }
+  } : {
+    "project-aurora-mgmt-repo-creds" = {
+      type     = "git"
+      url      = local.repo_creds_url
+      username = local.github_pat.username
+      password = local.github_pat.token
+    }
+  }
 }
 
 resource "helm_release" "argocd_instance" {
@@ -80,6 +110,22 @@ resource "helm_release" "argocd_instance" {
   values = [
     yamlencode({
       argocdInstance = local.argocd_values[var.k8s_provider]
+      register = {
+        clusters = {
+          (var.cluster_name) = {
+            server = "https://kubernetes.default.svc.cluster.local"
+            token  = local.cluster_registration_token
+            caData = base64encode(local.cluster_registration_ca_cert)
+          }
+        }
+        repositories = {
+          "project-aurora-mgmt" = {
+            type = "git"
+            url  = var.platform_git_repository.url
+          }
+        }
+        repositoryCreds = local.repository_creds
+      }
     })
   ]
 

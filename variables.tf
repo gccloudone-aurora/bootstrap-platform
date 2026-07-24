@@ -15,8 +15,8 @@ variable "azure_client_id" {
       - annotates the repo-server service account (azure.workload.identity/client-id)
       - sets ARGOCD_ENV_AZURE_CLIENT_ID for AVP → Azure Key Vault
   EOT
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
 
   validation {
     condition     = var.k8s_provider != "azure" || length(var.azure_client_id) > 0
@@ -30,8 +30,8 @@ variable "gcp_project_id" {
     GCP project ID that owns the Workload Identity GSA bound to Argo CD repo-server.
     Used to annotate the SA as: argocd-repo-server@<gcp_project_id>.iam.gserviceaccount.com
   EOT
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
 
   validation {
     condition     = var.k8s_provider != "gcp" || length(var.gcp_project_id) > 0
@@ -112,9 +112,9 @@ variable "argocd_operator_helm_chart_version" {
 }
 
 variable "argocd_instance_helm_chart_version" {
-  description = "Version of the argocd-instance Helm chart."
+  description = "Version of the argocd-instance Helm chart. Use >= 0.18.0 for GitHub App repositoryCreds."
   type        = string
-  default     = "0.15.0"
+  default     = "0.18.0"
 }
 
 variable "create_network_policies" {
@@ -130,6 +130,6 @@ variable "enable_auto_sync" {
     Applications require manual sync and AppProjects get a deny-all sync window
     that still permits manualSync.
   EOT
-  type    = bool
-  default = true
+  type        = bool
+  default     = true
 }

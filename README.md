@@ -68,6 +68,10 @@ Namespaces:
 When `cluster_registration` is omitted, this module creates `platform-system` and
 the `argocd-mgmt` service account (Azure/GCP bootstrap behaviour).
 
+Cluster, repository, and repo-creds secrets are created by the `argocd-instance`
+Helm chart via its `register` values (not separate Terraform secret resources).
+GitHub App auth for repo-creds requires chart version `>= 0.18.0`.
+
 ### Auto sync
 
 Set `enable_auto_sync = false` to require manual syncs (ApplicationSet omits
