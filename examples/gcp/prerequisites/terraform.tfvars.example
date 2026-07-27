@@ -1,0 +1,2 @@
+project_id = "" # required GCP project ID
+# region   = "northamerica-northeast1"

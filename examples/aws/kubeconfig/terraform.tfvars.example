@@ -1,0 +1,25 @@
+config_context = "" # e.g. arn:aws:eks:ca-central-1:123456789012:cluster/my-cluster
+
+platform = {
+  git = {
+    url    = "https://github.com/gccloudone-aurora/project-aurora-mgmt.git"
+    branch = "main"
+    path   = "clusters/non-prod/**/config.yaml"
+  }
+}
+
+github_auth = {
+  pat = {
+    username = "aurora-svc"
+    token    = ""
+  }
+}
+
+# Optional: register.clusters map (cluster name → server/token/caData).
+# cluster_registration = {
+#   "my-cluster" = {
+#     server = "https://kubernetes.default.svc.cluster.local"
+#     token  = "..."
+#     caData = "..."
+#   }
+# }

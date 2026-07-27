@@ -1,5 +1,8 @@
 locals {
-  # Add new configurations as bootstrap is developed
+  # AppSet destination: registered cluster name when cluster_registration is set
+  # (exactly one entry), otherwise Argo CD's built-in in-cluster destination.
+  appset_destination_name = length(var.cluster_registration) == 0 ? "in-cluster" : one(keys(var.cluster_registration))
+
   argocd_values = {
     aws = {
       argocdVaultPlugin = {
@@ -41,24 +44,21 @@ locals {
 }
 
 locals {
-  github_app = try(var.github_auth.github_app, null)
-  github_pat = try(var.github_auth.pat, null)
-
-  repo_creds_url = local.github_app != null ? coalesce(local.github_app.creds_url, var.platform_git_repository.url) : var.platform_git_repository.url
+  repo_creds_url = var.github_auth.github_app != null ? coalesce(var.github_auth.github_app.creds_url, var.platform.git.url) : var.platform.git.url
 
   # argocd-instance chart register.repositoryCreds (GitHub App requires chart >= 0.18.0)
-  repository_creds = local.github_app != null ? {
+  repository_creds = var.github_auth.github_app != null ? {
     "project-aurora-mgmt-repo-creds" = {
       type = "git"
       url  = local.repo_creds_url
       githubApp = merge(
         {
-          id             = local.github_app.id
-          installationID = local.github_app.installation_id
-          privateKey     = local.github_app.private_key
+          id             = var.github_auth.github_app.id
+          installationID = var.github_auth.github_app.installation_id
+          privateKey     = var.github_auth.github_app.private_key
         },
-        local.github_app.enterprise_base_url != null ? {
-          enterpriseBaseUrl = local.github_app.enterprise_base_url
+        var.github_auth.github_app.enterprise_base_url != null ? {
+          enterpriseBaseUrl = var.github_auth.github_app.enterprise_base_url
         } : {}
       )
     }
@@ -66,8 +66,9 @@ locals {
     "project-aurora-mgmt-repo-creds" = {
       type     = "git"
       url      = local.repo_creds_url
-      username = local.github_pat.username
-      password = local.github_pat.token
+      username = var.github_auth.pat.username
+      password = var.github_auth.pat.token
     }
   }
 }
+

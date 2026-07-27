@@ -1,0 +1,32 @@
+platform = {
+  git = {
+    url    = "https://github.com/gccloudone-aurora/project-aurora-mgmt.git"
+    branch = "main"
+    path   = "clusters/non-prod/**/config.yaml"
+  }
+  # helm = {
+  #   registry = "https://gccloudone-aurora.github.io/aurora-platform-charts"
+  # }
+}
+
+github_auth = {
+  pat = {
+    username = "aurora-svc"
+    token    = ""
+  }
+}
+
+# Defaults to ../prerequisites/terraform.tfstate after applying prerequisites/
+# prerequisites_remote_state = {
+#   backend = "local"
+#   config  = { path = "../prerequisites/terraform.tfstate" }
+# }
+
+# Optional: register.clusters map (cluster name → server/token/caData).
+# cluster_registration = {
+#   "bootstrap-azure-example" = {
+#     server = "https://kubernetes.default.svc.cluster.local"
+#     token  = "..."
+#     caData = "..." # base64-encoded CA
+#   }
+# }

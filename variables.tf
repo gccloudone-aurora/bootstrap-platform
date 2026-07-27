@@ -1,3 +1,7 @@
+#################
+## Cloud / CSP ##
+#################
+
 variable "k8s_provider" {
   description = "Cloud where the management cluster runs: aws, azure, or gcp."
   type        = string
@@ -39,31 +43,25 @@ variable "gcp_project_id" {
   }
 }
 
-variable "cluster_name" {
-  description = "The name of the kubernetes cluster. Used for setting up the initial cluster secret for ArgoCD registration."
-  type        = string
-}
+######################
+## Platform sources ##
+######################
 
-variable "cluster_registration" {
+variable "platform" {
   description = <<-EOT
-    Optional bearer token and CA certificate for the Argo CD cluster registration secret.
-    When null, this module creates the argocd-mgmt service account in platform-system.
-    When set (e.g. from terraform-aurora-aws-environment kubernetes_bootstrap), that SA is reused.
+    Platform sources:
+      - git: ApplicationSet generator and Argo CD repository secret (cluster config.yaml files)
+      - helm: chart repository used to install Argo CD charts and as AppSet chart repoURL
   EOT
   type = object({
-    token   = string
-    ca_cert = string
-  })
-  default   = null
-  sensitive = true
-}
-
-variable "platform_git_repository" {
-  description = "Git repository used as the ApplicationSet source and Argo CD repository secret (Aurora platform clusters config)."
-  type = object({
-    url    = string
-    branch = optional(string, "main")
-    path   = string
+    git = object({
+      url    = string
+      branch = optional(string, "main")
+      path   = string
+    })
+    helm = optional(object({
+      registry = optional(string, "https://gccloudone-aurora.github.io/aurora-platform-charts")
+    }), {})
   })
 }
 
@@ -73,7 +71,7 @@ variable "github_auth" {
       - pat: HTTPS username + personal access token (or fine-grained token)
       - github_app: GitHub App ID, installation ID, and PEM private key
     For github_app, set creds_url to an org/user URL prefix (e.g. https://github.com/my-org)
-    so credentials apply to all repos under that prefix; defaults to platform_git_repository.url.
+    so credentials apply to all repos under that prefix; defaults to platform.git.url.
   EOT
   type = object({
     pat = optional(object({
@@ -99,11 +97,31 @@ variable "github_auth" {
   }
 }
 
-variable "helm_registry" {
-  description = "Helm chart repository URL for Aurora platform charts."
-  type        = string
-  default     = "https://gccloudone-aurora.github.io/aurora-platform-charts"
+##########################
+## Cluster registration ##
+##########################
+
+variable "cluster_registration" {
+  description = <<-EOT
+    Optional Argo CD cluster secrets passed through to argocd-instance
+    register.clusters. Map key is the cluster name (and the AppSet
+    destination.name). When empty (default), Applications use the built-in
+    in-cluster destination. When set, provide exactly one entry — that key
+    becomes the aurora-platform ApplicationSet destination.
+    Caller must supply credentials (this module does not create an argocd-mgmt SA).
+  EOT
+  type = map(object({
+    server = string
+    token  = string
+    caData = string
+  }))
+  default   = {}
+  sensitive = true
 }
+
+####################
+## Argo CD charts ##
+####################
 
 variable "argocd_operator_helm_chart_version" {
   description = "Version of the argocd-operator Helm chart."
@@ -116,6 +134,10 @@ variable "argocd_instance_helm_chart_version" {
   type        = string
   default     = "0.18.0"
 }
+
+###############
+## Behaviour ##
+###############
 
 variable "create_network_policies" {
   description = "When true, create Kubernetes NetworkPolicies and CiliumClusterwideNetworkPolicies for Argo CD / platform namespaces. Set false to skip all network policy resources."

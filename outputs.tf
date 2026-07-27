@@ -3,11 +3,6 @@ output "argo_operator_namespace" {
   value       = kubernetes_namespace_v1.argo_operator_system.metadata[0].name
 }
 
-output "platform_system_namespace" {
-  description = "Namespace for platform system resources (e.g. argocd-mgmt service account)"
-  value       = try(kubernetes_namespace_v1.platform_system[0].metadata[0].name, "platform-system")
-}
-
 output "platform_management_namespace" {
   description = "Namespace where the Argo CD instance, secrets, and AppSets run"
   value       = kubernetes_namespace_v1.platform_management_system.metadata[0].name
@@ -39,7 +34,7 @@ output "admin_password_command" {
   value       = "kubectl get secret argocd-cluster -n ${kubernetes_namespace_v1.platform_management_system.metadata[0].name} -o go-template='{{index .data \"admin.password\" | base64decode}}'"
 }
 
-output "bootstrap_manifests_release" {
+output "bootstrap_aurora_platform_release" {
   description = "Helm release name for AppProjects, ApplicationSet, and Cilium policies"
-  value       = helm_release.bootstrap_manifests.name
+  value       = helm_release.bootstrap_aurora_platform.name
 }

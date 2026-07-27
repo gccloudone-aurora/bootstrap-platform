@@ -17,7 +17,7 @@ spec:
       name: {{ printf "platform-%s" (print "{{ path.basename }}") | quote }}
     spec:
       destination:
-        name: in-cluster
+        name: {{ .Values.appSet.destinationName | quote }}
         namespace: {{ .Values.namespace }}
       project: aurora
       source:

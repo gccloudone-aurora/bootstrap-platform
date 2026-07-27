@@ -1,9 +1,9 @@
 # AppProjects, ApplicationSet, NetworkPolicies, and Cilium CCNPs.
 # Applied via Helm so CRDs created by argocd-instance are not required at plan time
 # (kubernetes_manifest contacts the API for OpenAPI schema during plan).
-resource "helm_release" "bootstrap_manifests" {
-  name             = "bootstrap-manifests"
-  chart            = "${path.module}/charts/bootstrap-manifests"
+resource "helm_release" "bootstrap_aurora_platform" {
+  name             = "bootstrap-aurora-platform"
+  chart            = "${path.module}/charts/bootstrap-aurora-platform"
   namespace        = kubernetes_namespace_v1.platform_management_system.metadata[0].name
   create_namespace = false
   atomic           = true
@@ -30,10 +30,11 @@ resource "helm_release" "bootstrap_manifests" {
         }
       ]
       appSet = {
-        githubPath   = var.platform_git_repository.path
-        githubUrl    = var.platform_git_repository.url
-        githubBranch = var.platform_git_repository.branch
-        helmRegistry = var.helm_registry
+        githubPath      = var.platform.git.path
+        githubUrl       = var.platform.git.url
+        githubBranch    = var.platform.git.branch
+        helmRegistry    = var.platform.helm.registry
+        destinationName = local.appset_destination_name
       }
       networkPolicies = var.create_network_policies
       clusterwideNetworkPolicies = {
