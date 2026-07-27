@@ -2,7 +2,7 @@ config_context = "" # e.g. arn:aws:eks:ca-central-1:123456789012:cluster/my-clus
 
 platform = {
   git = {
-    url    = "https://github.com/gccloudone-aurora/project-aurora-mgmt.git"
+    url    = "https://github.com/gccloudone-aurora/project-<name>.git"
     branch = "main"
     path   = "clusters/non-prod/**/config.yaml"
   }

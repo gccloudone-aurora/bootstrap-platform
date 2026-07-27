@@ -6,7 +6,7 @@ k8s_provider = "aws"
 
 platform = {
   git = {
-    url    = "https://github.com/gccloudone-aurora/project-aurora-mgmt.git"
+    url    = "https://github.com/gccloudone-aurora/project-<name>.git"
     branch = "main"
     path   = "clusters/non-prod/**/config.yaml"
   }
