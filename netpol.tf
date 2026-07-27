@@ -52,12 +52,9 @@ resource "kubernetes_manifest" "allow_egress_to_apiserver_from_platform" {
   manifest = yamldecode(file("${path.module}/manifests/allow-egress-to-apiserver-from-platform.yaml"))
 }
 
-### GKE Specific ###
-
-# Policy to allow egress to coredns and local dns cache in GKE
+# Policy to allow egress to coredns and local dns cache
 resource "kubernetes_manifest" "gcp_egress_to_coredns" {
-  count = var.k8s_provider == "gcp" ? 1 : 0
-  manifest = yamldecode(file("${path.module}/manifests/gcp-allow-egress-to-coredns.yaml"))
+  manifest = yamldecode(file("${path.module}/manifests/allow-egress-to-coredns.yaml"))
 }
 
 # Policy to allow egress to gke metadata and workload identity
