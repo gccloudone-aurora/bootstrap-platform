@@ -1,4 +1,4 @@
-{{- if .Values.clusterwideNetworkPolicies.gcpCoreDns }}
+{{- if .Values.clusterwideNetworkPolicies.coreDns }}
 apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
 metadata:
@@ -6,20 +6,28 @@ metadata:
 spec:
   endpointSelector:
     matchExpressions:
+      # Shared: allow DNS egress from all namespaces except kube-system.
       - key: k8s:io.kubernetes.pod.namespace
         operator: NotIn
         values:
           - kube-system
+{{- if eq .Values.k8sProvider "gcp" }}
+      # GKE-specific: exclude addon-manager namespaces.
       - key: k8s:io.cilium.k8s.namespace.labels.addonmanager.kubernetes.io/mode
         operator: DoesNotExist
+{{- end }}
   egress:
     - toEndpoints:
+        # Shared: CoreDNS on EKS/AKS/GKE uses the kube-dns label.
         - matchLabels:
             k8s:k8s-app: kube-dns
             k8s:io.kubernetes.pod.namespace: kube-system
+{{- if eq .Values.k8sProvider "gcp" }}
+        # GKE NodeLocal DNSCache.
         - matchLabels:
             k8s:k8s-app: node-local-dns
             k8s:io.kubernetes.pod.namespace: kube-system
+{{- end }}
       toPorts:
         - ports:
             - port: "53"

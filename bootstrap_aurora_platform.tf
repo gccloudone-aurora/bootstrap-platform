@@ -37,12 +37,11 @@ resource "helm_release" "bootstrap_aurora_platform" {
         destinationName = local.appset_destination_name
       }
       networkPolicies = var.create_network_policies
+      k8sProvider     = var.k8s_provider
       clusterwideNetworkPolicies = {
         apiserverEgress = var.create_network_policies
-        gcpCoreDns      = var.create_network_policies && var.k8s_provider == "gcp"
-        cspMetadata     = var.create_network_policies && contains(["azure", "gcp"], var.k8s_provider)
-        awsCoreDns      = var.create_network_policies && var.k8s_provider == "aws"
-        awsMetadata     = var.create_network_policies && var.k8s_provider == "aws"
+        coreDns         = var.create_network_policies
+        metadata        = var.create_network_policies
       }
     })
   ]
