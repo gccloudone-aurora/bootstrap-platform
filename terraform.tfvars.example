@@ -1,7 +1,5 @@
-# See terraform-aurora-aws-environment/examples/comprehensive/bootstrap for the
-# AWS remote-state root that calls this module.
-#
 # When calling this module directly, supply:
+
 k8s_provider = "aws"
 
 platform = {
@@ -16,11 +14,21 @@ platform = {
 }
 
 github_auth = {
-  pat = {
-    username = "aurora-svc"
-    token    = ""
+  github_app = {
+    id              = ""
+    installation_id = ""
+    private_key     = ""
+    # creds_url     = "https://github.com/gccloudone-aurora" # optional; defaults to platform.git.url
   }
 }
+
+# Alternative: PAT auth (set exactly one of pat or github_app)
+# github_auth = {
+#   pat = {
+#     username = "aurora-svc"
+#     token    = ""
+#   }
+# }
 
 # Optional: register.clusters map (cluster name → server/token/caData).
 # cluster_registration = {
