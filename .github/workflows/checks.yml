@@ -1,0 +1,38 @@
+name: Bootstrap Checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.12.2"
+          terraform_wrapper: false
+      - uses: azure/setup-helm@v4.3.0
+        with:
+          version: "v3.19.2"
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - name: Check formatting
+        run: terraform fmt -check -recursive
+      - name: Initialize without a backend
+        run: terraform init -backend=false -input=false
+      - name: Validate Terraform
+        run: terraform validate -no-color
+      - name: Test OpenStack, Azure, GCP, and access safeguards
+        run: terraform test -filter=tests/bootstrap.tftest.hcl
+      - name: Lint both chart phases
+        run: |
+          helm lint charts/argocd-bootstrap
+          helm lint charts/argocd-bootstrap --set phase=readiness
+      - name: Test rendered policies and ApplicationSet expressions
+        run: ruby tests/chart_test.rb

@@ -1,9 +1,31 @@
 client_id       = ""
 cluster_name    = "<cluster_name>"
 config_context  = "<cluster_context_name>"
+config_path     = "~/.kube/config"
 github_token    = ""
 github_username = "aurora-svc"
 github_url      = "https://github.com/gccloudone-aurora/project-<name>.git"
 github_branch   = "main"
 github_path     = "platform/clusters/non-prod/<cluster_name>/config.yaml"
 k8s_provider    = "azure"
+
+application_auto_sync          = false
+project_permissions            = {}
+argocd_resources               = {}
+argocd_server_service_type     = "ClusterIP"
+argocd_service_monitor_enabled = false
+
+argocd_chart_versions = {
+  operator = "0.0.13"
+  instance = "0.27.0"
+}
+
+sso = {
+  enabled         = false
+  tenant_id       = ""
+  client_id       = ""
+  client_secret   = ""
+  admin_group     = ""
+  disable_admin   = false
+  access_verified = false
+}

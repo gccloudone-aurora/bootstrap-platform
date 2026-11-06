@@ -1,0 +1,28 @@
+{{- if eq .Values.phase "resources" }}
+{{- range .Values.projects }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ .name | quote }}
+  namespace: {{ $.Release.Namespace | quote }}
+spec:
+  clusterResourceWhitelist:
+    {{- toYaml $.Values.permissions.clusterResourceWhitelist | nindent 4 }}
+  description: {{ .description | quote }}
+  destinations:
+    {{- toYaml $.Values.permissions.destinations | nindent 4 }}
+  orphanedResources:
+    warn: true
+  sourceRepos:
+    {{- toYaml $.Values.permissions.sourceRepos | nindent 4 }}
+  syncWindows:
+    - clusters:
+        - "*"
+      duration: 3h
+      kind: allow
+      manualSync: true
+      schedule: "* 19 * * 2,4"
+      timeZone: America/Toronto
+{{- end }}
+{{- end }}

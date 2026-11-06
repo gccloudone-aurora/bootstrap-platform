@@ -9,6 +9,8 @@ spec:
         operator: NotIn
         values:
           - kube-system
+      - key: k8s:kubernetes.azure.com/managedby
+        operator: DoesNotExist
   egress:
     - toCIDR:
         - 169.254.169.252/32
