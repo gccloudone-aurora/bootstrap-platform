@@ -1,16 +1,40 @@
-# Create a service account along with RBAC for cluster registration.
-#
-# https://github.com/gccloudone-aurora-iac/terraform-kubernetes-cluster-register.git
-#
-module "argocd_cluster_sp" {
-  source = "git::https://github.com/gccloudone-aurora-iac/terraform-kubernetes-cluster-register.git?ref=v1.0.0"
+resource "kubernetes_service_account_v1" "argocd_registration" {
+  metadata {
+    name      = "argocd-mgmt"
+    namespace = kubernetes_namespace_v1.platform_system.metadata[0].name
+  }
 
-  service_account_name = "argocd-mgmt"
-  namespace            = "platform-system"
+  lifecycle {
+    ignore_changes = [image_pull_secret]
+  }
+}
 
-  role_binding = {
-    scope     = "cluster"
-    role_name = "cluster-admin"
+resource "kubernetes_secret_v1" "argocd_registration_token" {
+  metadata {
+    name      = "argocd-mgmt-token"
+    namespace = kubernetes_namespace_v1.platform_system.metadata[0].name
+    annotations = {
+      "kubernetes.io/service-account.name" = kubernetes_service_account_v1.argocd_registration.metadata[0].name
+    }
+  }
+
+  type                           = "kubernetes.io/service-account-token"
+  wait_for_service_account_token = true
+}
+
+resource "kubernetes_cluster_role_binding_v1" "argocd_registration" {
+  metadata {
+    name = "argocd-mgmt"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.argocd_registration.metadata[0].name
+    namespace = kubernetes_namespace_v1.platform_system.metadata[0].name
   }
 }
 
@@ -33,10 +57,10 @@ resource "kubernetes_secret_v1" "cluster_bootstrap" {
     "name"   = var.cluster_name
     "server" = "https://kubernetes.default.svc.cluster.local"
     "config" = jsonencode({
-      "bearerToken" = module.argocd_cluster_sp.service_account_token_secret.data.token
+      "bearerToken" = kubernetes_secret_v1.argocd_registration_token.data.token
       "tlsClientConfig" = {
         "insecure" = false,
-        "caData"   = base64encode(module.argocd_cluster_sp.service_account_token_secret.data["ca.crt"])
+        "caData"   = base64encode(kubernetes_secret_v1.argocd_registration_token.data["ca.crt"])
       }
     })
   }

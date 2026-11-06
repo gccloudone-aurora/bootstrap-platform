@@ -1,0 +1,38 @@
+{{- if eq .Values.phase "resources" }}
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: aurora-platform
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  generators:
+    - git:
+        files:
+          - path: {{ .Values.git.path | quote }}
+        repoURL: {{ .Values.git.url | quote }}
+        revision: {{ .Values.git.branch | quote }}
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      name: {{ "platform-{{ path.basename }}" | quote }}
+    spec:
+      destination:
+        name: in-cluster
+        namespace: {{ .Release.Namespace | quote }}
+      project: aurora
+      source:
+        chart: aurora-platform
+        repoURL: https://gccloudone-aurora.github.io/aurora-platform-charts
+        helm:
+          releaseName: {{ "{{ path.basename }}" | quote }}
+          values: |
+            {{ "{{ settings }}" }}
+        targetRevision: {{ "{{ version }}" | quote }}
+      {{- if .Values.automation.enabled }}
+      syncPolicy:
+        automated:
+          prune: false
+          selfHeal: true
+      {{- end }}
+{{- end }}

@@ -1,0 +1,36 @@
+phase: resources
+chartRevision: ""
+
+readiness:
+  image: registry.k8s.io/kubectl:v1.36.3
+  timeoutSeconds: 300
+
+git:
+  url: https://github.com/example/platform.git
+  branch: main
+  path: platform/clusters/**/config.yaml
+
+automation:
+  enabled: false
+
+permissions:
+  sourceRepos:
+    - https://gccloudone-aurora.github.io/aurora-platform-charts
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: "*"
+    - server: https://kubernetes.default.svc.cluster.local
+      namespace: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+projects:
+  - name: aurora
+    description: App Project for Aurora Platform
+  - name: aurora-core
+    description: App Project for Aurora Core
+  - name: aurora-app
+    description: App Project for Aurora App
+  - name: aurora-solution
+    description: App Project for Aurora Solution
